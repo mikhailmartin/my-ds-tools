@@ -7,6 +7,59 @@ import pandas as pd
 import seaborn as sns
 
 
+def cat_feature_report(
+        data: pd.DataFrame,
+        *,
+        feature_colname: str,
+        target_colname: str,
+        figsize: Optional[Tuple[float, float]] = None,
+) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
+    """
+    Визуализирует разницу в распределениях категориального признака для целевых классов.
+
+    Args:
+        data: pd.DataFrame, содержащий исследуемый признак и целевую переменную.
+        feature_colname: название столбца с исследуемым признаком.
+        target_colname: название столбца с целевой переменной.
+        figsize: (ширина, высота) рисунка в дюймах.
+
+    Returns:
+        Кортеж (fig, ax).
+          fig: matplotlib.Figure, содержащий все графики.
+          axes: matplotlib.axes.Axes, содержащие отрисованные график.
+    """
+    data = data[[feature_colname, target_colname]].copy()
+
+    # если есть пропуски
+    if data[feature_colname].isna().sum():
+        if figsize is None:
+            figsize = (19.2, 4.8)
+        fig, axes = plt.subplots(1, 3, figsize=figsize)
+        # график, где пропуски рассматриваются как доп. категория
+        tmp_data = data.copy()
+        if tmp_data[feature_colname].dtype.name == 'category':
+            tmp_data[feature_colname] = tmp_data[feature_colname].cat.add_categories(['пропуск'])
+        tmp_data[feature_colname] = tmp_data[feature_colname].fillna('пропуск')
+        _bar_plot(
+            tmp_data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[1])
+        del tmp_data
+        # график, где исследуется распределение значение/пропуск
+        na_bar_plot(
+            data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[2])
+    else:
+        if figsize is None:
+            figsize = (6.4, 4.8)
+        fig, axes = plt.subplots(1, 1, figsize=figsize)
+        axes = [axes]  # заглушка
+    # график, где рассматривается распределение только значений, т.е. без пропусков
+    data = data.dropna(subset=feature_colname)
+    _bar_plot(data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[0])
+    axes[0].set(xlabel='Целевые классы', ylabel='Доли категорий')
+    fig.suptitle(f'cat_feature_report для признака {feature_colname}')
+
+    return fig, axes
+
+
 def num_feature_report(
         data: pd.DataFrame,
         *,
@@ -44,7 +97,8 @@ def num_feature_report(
         if figsize is None:
             figsize = (19.2, 4.8)
         fig, axes = plt.subplots(1, 3, figsize=figsize)
-        na_bar_plot(data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[2])
+        na_bar_plot(
+            data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[2])
     else:
         if figsize is None:
             figsize = (12.8, 4.8)
@@ -75,7 +129,7 @@ def _slice_by_value_range(
         data: pd.DataFrame,
         feature_colname: str,
         value_range: Optional[Tuple[float | None, float | None]] = (None, None),
-):
+) -> pd.DataFrame:
     """
     Возвращает срез pd.DataFrame по задаваемому признаку и диапазону значений.
 
