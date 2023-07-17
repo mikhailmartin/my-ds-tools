@@ -4,6 +4,22 @@ from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 
 
+class ABS(BaseEstimator, TransformerMixin):
+    def init(self):
+        self.columns = None
+
+    def fit(self, X: pd.DataFrame, y=None):
+        self.columns = np.array(X.columns)
+
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        return X.abs()
+
+    def get_feature_names_out(self, *args, **params):
+        return self.columns
+
+
 class AddDif(BaseEstimator, TransformerMixin):
     """Добавляет разность заданных признаков к остальным."""
     def __init__(self):
