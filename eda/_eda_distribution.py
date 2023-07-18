@@ -13,6 +13,7 @@ def cat_feature_report(
         feature_colname: str,
         target_colname: str,
         figsize: Optional[Tuple[float, float]] = None,
+        x_rot: Optional[int | float] = 0,
 ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
     Визуализирует разницу в распределениях категориального признака для целевых классов.
@@ -22,6 +23,7 @@ def cat_feature_report(
         feature_colname: название столбца с исследуемым признаком.
         target_colname: название столбца с целевой переменной.
         figsize: (ширина, высота) рисунка в дюймах.
+        x_rot: угол наклона xticklabels.
 
     Returns:
         Кортеж (fig, ax).
@@ -41,11 +43,21 @@ def cat_feature_report(
             tmp_data[feature_colname] = tmp_data[feature_colname].cat.add_categories(['пропуск'])
         tmp_data[feature_colname] = tmp_data[feature_colname].fillna('пропуск')
         _bar_plot(
-            tmp_data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[1])
+            tmp_data,
+            feature_colname=feature_colname,
+            target_colname=target_colname,
+            x_rot=x_rot,
+            ax=axes[1],
+        )
         del tmp_data
         # график, где исследуется распределение значение/пропуск
         na_bar_plot(
-            data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[2])
+            data,
+            feature_colname=feature_colname,
+            target_colname=target_colname,
+            x_rot=x_rot,
+            ax=axes[2],
+        )
     else:
         if figsize is None:
             figsize = (6.4, 4.8)
@@ -53,7 +65,13 @@ def cat_feature_report(
         axes = [axes]  # заглушка
     # график, где рассматривается распределение только значений, т.е. без пропусков
     data = data.dropna(subset=feature_colname)
-    _bar_plot(data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[0])
+    _bar_plot(
+        data,
+        feature_colname=feature_colname,
+        target_colname=target_colname,
+        x_rot=x_rot,
+        ax=axes[0],
+    )
     axes[0].set(xlabel='Целевые классы', ylabel='Доли категорий')
     fig.suptitle(f'cat_feature_report для признака {feature_colname}')
 
@@ -159,6 +177,7 @@ def na_bar_plot(
         feature_colname: str,
         target_colname: str,
         ax: Optional[matplotlib.axes.Axes] = None,
+        x_rot: Optional[int | float] = 0,
 ) -> matplotlib.axes.Axes:
     """
     Визуализирует разницу в доле пропусков для целевых классов.
@@ -168,6 +187,7 @@ def na_bar_plot(
         feature_colname: название столбца с исследуемым признаком.
         target_colname: название столбца с целевой переменной.
         ax: matplotlib.axes.Axes, на котором следует отрисовать график.
+        x_rot: угол наклона xticklabels.
 
     Returns:
         ax: matplotlib.axes.Axes с отрисованным графиком.
@@ -180,7 +200,7 @@ def na_bar_plot(
     data['has_na'] = data[feature_colname].isna().replace({True: 'пропуск', False: 'значение'})
     del data[feature_colname]
 
-    _bar_plot(data, feature_colname='has_na', target_colname=target_colname, ax=ax)
+    _bar_plot(data, feature_colname='has_na', target_colname=target_colname, x_rot=x_rot, ax=ax)
     ax.set(ylabel='Доли пропусков')
 
     return ax
@@ -192,6 +212,7 @@ def _bar_plot(
         feature_colname: str,
         target_colname: str,
         ax: Optional[matplotlib.axes.Axes] = None,
+        x_rot: Optional[int | float] = 0,
 ) -> matplotlib.axes.Axes:
     """
     Визуализирует распределение значений признака в виде столбчатой диаграммы для целевых классов.
@@ -201,6 +222,7 @@ def _bar_plot(
         feature_colname: название столбца с исследуемым признаком.
         target_colname: название столбца с целевой переменной.
         ax: ранее созданный ax.
+        x_rot: угол наклона xticklabels.
 
     Returns:
         ax: matplotlib.axes.Axes с отрисованным графиком.
@@ -237,7 +259,7 @@ def _bar_plot(
 
     labels = [str(label) for label in labels] + ['весь датасет']
 
-    bottom = np.zeros(len(labels))
+    bottom = np.empty(len(labels))
     for i, category in enumerate(categories):
         ax.bar(labels, a[i], bottom=bottom, label=category)
         bottom += a[i]
@@ -256,5 +278,6 @@ def _bar_plot(
     ax.set_position([box.x0, box.y0, box.width * .8, box.height])
     ax.legend(bbox_to_anchor=(1, 1.05), title='Категории')
     ax.set(xlabel='Целевые классы', ylabel='Доли категорий')
+    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=x_rot, ha='right')
 
     return ax
