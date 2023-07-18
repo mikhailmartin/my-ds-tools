@@ -85,6 +85,7 @@ def num_feature_report(
         target_colname: str,
         value_range: Optional[Tuple[float | None, float | None]] = (None, None),
         figsize: Optional[Tuple[float, float]] = None,
+        x_rot: Optional[int | float] = 0,
         histplot_args: Dict = None,
 ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
@@ -96,6 +97,7 @@ def num_feature_report(
         target_colname: название столбца с целевой переменной.
         value_range: задаваемый диапазон рассматриваемых значений.
         figsize: (ширина, высота) рисунка в дюймах.
+        x_rot: угол наклона xticklabels.
         histplot_args: аргументы для seaborn.histplot().
 
     Returns:
@@ -116,7 +118,12 @@ def num_feature_report(
             figsize = (19.2, 4.8)
         fig, axes = plt.subplots(1, 3, figsize=figsize)
         na_bar_plot(
-            data, feature_colname=feature_colname, target_colname=target_colname, ax=axes[2])
+            data,
+            feature_colname=feature_colname,
+            target_colname=target_colname,
+            x_rot=x_rot,
+            ax=axes[2],
+        )
     else:
         if figsize is None:
             figsize = (12.8, 4.8)
