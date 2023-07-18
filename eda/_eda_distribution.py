@@ -247,22 +247,23 @@ def _bar_plot(
     if ax is None:
         ax = plt.subplot()
 
-    a = []
-    for category in categories:
-        category_ratios = []
-        for label in labels:
+    shape = len(categories), len(labels)+1
+    a = np.empty(shape, dtype=float)
+    for i, category in enumerate(categories):
+        category_ratios = np.empty(shape[1], dtype=float)
+        for j, label in enumerate(labels):
             class_df = data[data[target_colname] == label]
             all_count = class_df.shape[0]
             category_count = class_df[class_df[feature_colname] == category].shape[0]
             ratio = category_count / all_count
-            category_ratios.append(ratio)
+            category_ratios[j] = ratio
 
         all_count = data.shape[0]
         category_count = data[data[feature_colname] == category].shape[0]
         ratio = category_count / all_count
-        category_ratios.append(ratio)
+        category_ratios[-1] = ratio
 
-        a.append(category_ratios)
+        a[i] = category_ratios
 
     labels = [str(label) for label in labels] + ['весь датасет']
 
