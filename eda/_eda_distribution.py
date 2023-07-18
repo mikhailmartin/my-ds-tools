@@ -266,7 +266,7 @@ def _bar_plot(
 
     labels = [str(label) for label in labels] + ['весь датасет']
 
-    bottom = np.empty(len(labels))
+    bottom = np.zeros(len(labels))
     for i, category in enumerate(categories):
         ax.bar(labels, a[i], bottom=bottom, label=category)
         bottom += a[i]
