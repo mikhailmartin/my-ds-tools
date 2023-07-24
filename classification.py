@@ -112,7 +112,7 @@ def precision_recall_plot(
     recall_scores = np.empty(threshold_len, dtype=float)
 
     for i, threshold in enumerate(thresholds):
-        y_pred = np.array([1 if proba >= threshold else 0 for proba in y_proba])
+        y_pred = np.where(y_proba >= threshold, 1, 0)
 
         precision_scores[i] = precision_score(y_true, y_pred)
         recall_scores[i] = recall_score(y_true, y_pred)
