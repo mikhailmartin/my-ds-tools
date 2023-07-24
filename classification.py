@@ -14,9 +14,10 @@ from sklearn.metrics import recall_score
 
 
 def my_binary_classification_report(
+        classifier,
+        X: pd.DataFrame,
         y_true: pd.Series,
-        y_pred: np.ndarray,
-        y_proba: np.ndarray,
+        threshold: Optional[float] = .5,
         *,
         classifier_name: Optional[str] = None,
         figsize: Optional[Tuple[float, float]] = None,
@@ -28,15 +29,19 @@ def my_binary_classification_report(
     `sklearn.classification_report` и индекс Gini.
 
     Args:
+        classifier: классификатор.
+        X: признаки.
         y_true: истинные метки.
-        y_pred: предсказанные метки.
-        y_proba: предсказанные вероятности отнесения к положительному классу.
+        threshold: порог бинаризации.
         classifier_name: имя классификатора.
         figsize: (ширина, высота) рисунка в дюймах.
     """
     if figsize is None:
-        figsize = (12.8, 9.6)
+        figsize = (12.8, 10.6)
     fig, axes = plt.subplots(2, 2, figsize=figsize)
+
+    y_proba = classifier.predict_proba(X)[:, 1]
+    y_pred = np.where(y_proba >= threshold, 1, 0)
 
     ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=axes[0, 0], colorbar=False)
     axes[0, 0].set(title='Матрица ошибок')
@@ -52,6 +57,7 @@ def my_binary_classification_report(
 
     # Графики зависимости Precision и Recall от порога бинаризации
     precision_recall_plot(y_true, y_proba, ax=axes[1, 1])
+    axes[1, 1].set(title='Precision- и Recall-кривые')
 
     plt.show()
 
