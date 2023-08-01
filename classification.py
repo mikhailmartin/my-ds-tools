@@ -5,12 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import ConfusionMatrixDisplay
-from sklearn.metrics import RocCurveDisplay
+
+from sklearn.metrics import ConfusionMatrixDisplay, RocCurveDisplay
 from sklearn.metrics import classification_report
-from sklearn.metrics import precision_score
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import recall_score
+from sklearn.metrics import precision_score, recall_score, roc_auc_score
 
 
 def my_binary_classification_report(
