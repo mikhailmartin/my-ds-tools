@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -19,6 +19,8 @@ def my_binary_classification_report(
         *,
         classifier_name: Optional[str] = None,
         figsize: Optional[Tuple[float, float]] = None,
+        cm_kw: Optional[Dict] = None,
+        rc_kw: Optional[Dict] = None,
 ) -> None:
     """
     Предоставляет отчёт по бинарной классификации.
@@ -33,6 +35,10 @@ def my_binary_classification_report(
         threshold: порог бинаризации.
         classifier_name: имя классификатора.
         figsize: (ширина, высота) рисунка в дюймах.
+        cm_kw: словарь с именованными аргументами для
+          sklearn.metrics.ConfusionMatrixDisplay.from_predictions().
+        rc_kw: словарь с именованными аргументами для
+          sklearn.metrics.RocCurveDisplay.from_predictions().
     """
     if figsize is None:
         figsize = (12.8, 10.6)
@@ -41,15 +47,20 @@ def my_binary_classification_report(
     y_proba = classifier.predict_proba(X)[:, 1]
     y_pred = np.where(y_proba >= threshold, 1, 0)
 
-    ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=axes[0, 0], colorbar=False)
+    default_cm_kw = dict(colorbar=False)
+    cm_kw = cm_kw or {}
+    cm_kw = {**default_cm_kw, **cm_kw}
+    ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=axes[0, 0], **cm_kw)
     axes[0, 0].set(title='Матрица ошибок')
     axes[0, 0].grid()
 
     sns.histplot(data=y_proba, stat='density', kde=True, ax=axes[0, 1])
     axes[0, 1].set(xlabel='Probability')
 
-    RocCurveDisplay.from_predictions(
-        y_true, y_proba, name=classifier_name, ax=axes[1, 0], color='orange')
+    default_rc_kw = dict(color='orange')
+    rc_kw = rc_kw or {}
+    rc_kw = {**default_rc_kw, **rc_kw}
+    RocCurveDisplay.from_predictions(y_true, y_proba, name=classifier_name, ax=axes[1, 0], **rc_kw)
     axes[1, 0].plot([0, 1], [0, 1], color='navy', linestyle='--')
     axes[1, 0].set(title='ROC-кривая', xlim=(-0.01, 1), ylim=(0, 1.01))
 
@@ -66,25 +77,34 @@ def my_binary_classification_report(
 
 
 def my_multiclass_classification_report(
+        classifier,
+        X: pd.DataFrame,
         y_true: pd.Series,
-        y_pred: np.ndarray,
         *,
         figsize: Optional[Tuple[float, float]] = None,
+        cm_kw: Optional[Dict] = None,
 ) -> None:
     """
     Предоставляет отчёт по мультиклассовой классификации.
 
     Args:
+        classifier: классификатор.
+        X: признаки.
         y_true: истинные метки.
-        y_pred: предсказанные метки.
         figsize: (ширина, высота) рисунка в дюймах.
+        cm_kw: словарь с именованными аргументами для
+          sklearn.metrics.ConfusionMatrixDisplay.from_predictions().
     """
     if figsize is None:
         figsize = (6.4, 4.8)
-
     fig, ax = plt.subplots(figsize=figsize)
 
-    ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=ax, colorbar=False)
+    y_pred = classifier.predict(X)
+
+    default_cm_kw = dict(colorbar=False)
+    cm_kw = cm_kw or {}
+    cm_kw = {**default_cm_kw, **cm_kw}
+    ConfusionMatrixDisplay.from_predictions(y_true, y_pred, ax=ax, **cm_kw)
     ax.set(title='Матрица ошибок')
 
     plt.show()
