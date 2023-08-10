@@ -146,8 +146,9 @@ class GenDataFromDatetime(BaseEstimator, TransformerMixin):
 
 class GenInterest(BaseEstimator, TransformerMixin):
     """Генерирует и добавляет проценты к остальным признакам."""
-    def __init__(self):
+    def __init__(self, interest_rate: float):
         self.columns = None
+        self.interest_rate = interest_rate
 
     def fit(self, X, y=None):
         self.columns = np.array(X.columns.to_list() + ['interest'])
@@ -155,7 +156,7 @@ class GenInterest(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        X['interest'] = (X.iloc[:, 0] * .0010378267640343 * X.iloc[:, 1]).round(2)
+        X['interest'] = (X.iloc[:, 0] * self.interest_rate * X.iloc[:, 1]).round(2)
 
         return X
 
