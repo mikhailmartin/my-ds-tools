@@ -1,3 +1,5 @@
+from functools import wraps
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -162,3 +164,20 @@ class GenInterest(BaseEstimator, TransformerMixin):
 
     def get_feature_names_out(self, *args, **params):
         return self.columns
+
+
+def function_transformer_available(function):
+    """Оборачивает функцию, работающую с содержимым ячейки pd.Series, в работающую с самим
+    pd.Series."""
+    @wraps(function)
+    def wrapper(t: pd.Series | pd.DataFrame) -> pd.DataFrame:
+        if isinstance(t, pd.Series):
+            t = pd.DataFrame(t)
+
+        for col in t.columns:
+            t[col] = t[col].apply(function)
+
+        return t
+
+    return wrapper
+
