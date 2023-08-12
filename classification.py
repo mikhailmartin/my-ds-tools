@@ -115,7 +115,7 @@ def my_multiclass_classification_report(
 def precision_recall_plot(
         y_true: pd.Series,
         y_proba: np.ndarray,
-        ax: matplotlib.axes.Axes,
+        ax: Optional[matplotlib.axes.Axes] = None,
         nbin: Optional[int] = 255,
 ) -> None:
     """
@@ -128,6 +128,9 @@ def precision_recall_plot(
         ax: matplotlib.axes.Axes, на котором следует отрисовать графики.
         nbin: количество бинов для равночастотного биннинга.
     """
+    if ax is None:
+        ax = plt.subplot()
+
     # равночастотный биннинг
     thresholds = np.interp(np.linspace(0, len(y_proba), nbin+1), np.arange(len(y_proba)), np.sort(y_proba))[1: -1]
 
@@ -145,3 +148,4 @@ def precision_recall_plot(
     ax.plot(thresholds, recall_scores, color='blue', label='recall')
     ax.set(xlabel='величина порога')
     ax.legend()
+    ax.grid()
