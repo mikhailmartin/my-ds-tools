@@ -3,6 +3,7 @@
 ## База
 - [Учебник по машинному обучению](https://academy.yandex.ru/handbook/ml)
 - [ODS](https://ods.ai/)
+- [CS231n: Convolutional Neural Networks for Visual Recognition](https://cs231n.github.io/)
 
 ## Рекомендашки
 - [Рекомендательные системы: проблемы и методы решения. Часть 1](https://habr.com/ru/companies/prequel/articles/567648/)
