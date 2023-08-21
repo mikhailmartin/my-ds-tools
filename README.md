@@ -26,3 +26,6 @@
 
 ## Пропуски в данных
 - [Обработка пропусков в данных](https://loginom.ru/blog/missing)
+
+## Дисбаланс классов
+- [Дисбаланс классов](https://alexanderdyakonov.wordpress.com/2021/05/27/imbalance/)
