@@ -60,7 +60,8 @@ def my_binary_classification_report(
     default_rc_kw = dict(color='orange')
     rc_kw = rc_kw or {}
     rc_kw = {**default_rc_kw, **rc_kw}
-    RocCurveDisplay.from_predictions(y_true, y_proba, name=classifier_name, ax=axes[1, 0], **rc_kw)
+    RocCurveDisplay.from_predictions(
+        y_true, y_proba, name=classifier_name, ax=axes[1, 0], **rc_kw)
     axes[1, 0].plot([0, 1], [0, 1], color='navy', linestyle='--')
     axes[1, 0].set(title='ROC-кривая', xlim=(-0.01, 1), ylim=(0, 1.01))
 
@@ -116,11 +117,11 @@ def precision_recall_plot(
         y_true: pd.Series,
         y_proba: np.ndarray,
         ax: Optional[matplotlib.axes.Axes] = None,
-        nbin: Optional[int] = 255,
+        nbin: int = 255,
 ) -> None:
     """
-    Рисует на заданном matplotlib.axes.Axes графики зависимости Precision и Recall от порога
-    бинаризации.
+    Рисует на заданном matplotlib.axes.Axes графики зависимости Precision и Recall от
+    порога бинаризации.
 
     Args:
         y_true: истинные метки.

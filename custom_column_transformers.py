@@ -134,11 +134,15 @@ class GenDataFromDatetime(BaseEstimator, TransformerMixin):
 
         result = pd.DataFrame(index=app_date.index)
         if self.day:
-            result['day'] = pd.Categorical(app_date.dt.day, categories=list(range(1, 32)))
+            result['day'] = pd.Categorical(
+                app_date.dt.day, categories=list(range(1, 32)))
         if self.weekday:
-            result['weekday'] = pd.Categorical(app_date.dt.weekday, categories=list(range(7)))
+            result['weekday'] = pd.Categorical(
+                app_date.dt.weekday, categories=list(range(7)))
         if self.seconds:
-            result['seconds'] = pd.to_timedelta(app_date.dt.time.astype(str)).dt.total_seconds()
+            result['seconds'] = (
+                pd.to_timedelta(app_date.dt.time.astype(str)).dt.total_seconds()
+            )
 
         return result
 
@@ -167,8 +171,10 @@ class GenInterest(BaseEstimator, TransformerMixin):
 
 
 def function_transformer_available(function):
-    """Оборачивает функцию, работающую с содержимым ячейки pd.Series, в работающую с самим
-    pd.Series."""
+    """
+    Оборачивает функцию, работающую с содержимым ячейки pd.Series, в работающую с
+    самим pd.Series.
+    """
     @wraps(function)
     def wrapper(t: pd.Series | pd.DataFrame) -> pd.DataFrame:
         if isinstance(t, pd.Series):

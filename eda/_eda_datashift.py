@@ -14,7 +14,7 @@ def ridge_plot(
         *,
         feature_colname: str,
         date_colname: str,
-        value_range: Optional[Tuple[float | None, float | None]] = (None, None),
+        value_range: Tuple[float | None, float | None] = (None, None),
         freq: str,
 ) -> None:
     """
@@ -38,12 +38,12 @@ def ridge_plot(
         'M': 7,  # 2023-02
         'D': 10,  # 2023-02-10
     }
-    data['gropby_index'] = data[date_colname].astype(str).apply(lambda x: x[:length[freq]])
+    data['gropby_index'] = data[date_colname].apply(lambda x: str(x)[:length[freq]])
     data = data.sort_values('gropby_index')
 
     sns.set_theme(style='white', rc={'axes.facecolor': (0, 0, 0, 0)})
-    # in the sns.FacetGrid class, the 'hue' argument is the one that is the one that will be
-    # represented by colors with 'palette'
+    # in the sns.FacetGrid class, the `hue` argument is the one that is the one that
+    # will be represented by colors with `palette`
     g = sns.FacetGrid(
         data,
         row='gropby_index',
@@ -102,10 +102,10 @@ def area_plot(
         date_colname: str,
         freq: str,
         ax: Optional[matplotlib.axes.Axes] = None,
-) -> matplotlib.axes.Axes:
+) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
-    Визуализирует распределения численного дискретного или категориального признака для целевых
-    классов.
+    Визуализирует распределения численного дискретного или категориального признака для
+    целевых классов.
 
     Args:
         data: pd.DataFrame, содержащий исследуемый признак и поле с датами.
@@ -121,7 +121,8 @@ def area_plot(
         ax = plt.subplot()
 
     grouped = (
-        data.groupby([pd.Grouper(key=date_colname, freq=freq), feature_colname])[date_colname]
+        data
+        .groupby([pd.Grouper(key=date_colname, freq=freq), feature_colname])[date_colname]
         .count().unstack()
     )
     normalized = (grouped.T / grouped.sum(axis=1)).T
@@ -139,12 +140,14 @@ def na_datashift(
         target_colname: str,
         date_colname: str,
         figsize: Optional[Tuple[float, float]] = (6.4, 4.8),
-):
+) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
-    Визуализирует доли пропусков в исследуемом признаке по дням в виде вафельной диаграммы.
+    Визуализирует доли пропусков в исследуемом признаке по дням в виде вафельной
+    диаграммы.
 
     Args:
-        data: pd.DataFrame, содержащий исследуемый признак, целевую переменную и поле с датами.
+        data: pd.DataFrame, содержащий исследуемый признак, целевую переменную и поле с
+          датами.
         feature_colname: название столбца с исследуемым признаком.
         target_colname: название столбца с целевой переменной.
         date_colname: название столбца с датами.

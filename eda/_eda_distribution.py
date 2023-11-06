@@ -83,13 +83,14 @@ def num_feature_report(
         *,
         feature_colname: str,
         target_colname: str,
-        value_range: Optional[Tuple[float | None, float | None]] = (None, None),
+        value_range: Tuple[float | None, float | None] = (None, None),
         figsize: Optional[Tuple[float, float]] = None,
-        x_rot: Optional[int | float] = 0,
-        histplot_args: Dict = None,
+        x_rot: int | float = 0,
+        histplot_args: Optional[Dict] = None,
 ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
-    Визуализирует разницу в распределениях численного непрерывного признака для целевых классов.
+    Визуализирует разницу в распределениях численного непрерывного признака для целевых
+    классов.
 
     Args:
         data: pd.DataFrame, содержащий исследуемый признак и целевую переменную.
@@ -130,7 +131,8 @@ def num_feature_report(
         fig, axes = plt.subplots(1, 2, figsize=figsize)
 
     # Violinplot
-    sns.violinplot(data=data, x=feature_colname, y=target_colname, orient='h', ax=axes[0])
+    sns.violinplot(
+        data=data, x=feature_colname, y=target_colname, orient='h', ax=axes[0])
     axes[0].set(title='Violinplot')
 
     # Density Histogram
@@ -153,14 +155,15 @@ def num_feature_report(
 def _slice_by_value_range(
         data: pd.DataFrame,
         feature_colname: str,
-        value_range: Optional[Tuple[float | None, float | None]] = (None, None),
+        value_range: Tuple[float | None, float | None] = (None, None),
 ) -> pd.DataFrame:
     """
     Возвращает срез pd.DataFrame по задаваемому признаку и диапазону значений.
 
     Args:
         data: pd.DataFrame, который необходимо обрезать.
-        feature_colname: название столбца с признаком, по которому необходимо сделать срез.
+        feature_colname: название столбца с признаком, по которому необходимо сделать
+          срез.
         value_range: задаваемый диапазон рассматриваемых значений.
 
     Returns:
@@ -184,7 +187,7 @@ def na_bar_plot(
         feature_colname: str,
         target_colname: str,
         ax: Optional[matplotlib.axes.Axes] = None,
-        x_rot: Optional[int | float] = 0,
+        x_rot: int | float = 0,
 ) -> matplotlib.axes.Axes:
     """
     Визуализирует разницу в доле пропусков для целевых классов.
@@ -204,10 +207,20 @@ def na_bar_plot(
     if not ax:
         ax = plt.subplot()
 
-    data['has_na'] = data[feature_colname].isna().replace({True: 'пропуск', False: 'значение'})
+    data['has_na'] = (
+        data[feature_colname]
+        .isna()
+        .replace({True: 'пропуск', False: 'значение'})
+    )
     del data[feature_colname]
 
-    _bar_plot(data, feature_colname='has_na', target_colname=target_colname, x_rot=x_rot, ax=ax)
+    _bar_plot(
+        data,
+        feature_colname='has_na',
+        target_colname=target_colname,
+        x_rot=x_rot,
+        ax=ax,
+    )
     ax.set(ylabel='Доли пропусков')
 
     return ax
@@ -219,10 +232,11 @@ def _bar_plot(
         feature_colname: str,
         target_colname: str,
         ax: Optional[matplotlib.axes.Axes] = None,
-        x_rot: Optional[int | float] = 0,
+        x_rot: int | float = 0,
 ) -> matplotlib.axes.Axes:
     """
-    Визуализирует распределение значений признака в виде столбчатой диаграммы для целевых классов.
+    Визуализирует распределение значений признака в виде столбчатой диаграммы для
+    целевых классов.
 
     Args:
         data: pd.DataFrame, содержащий исследуемый признак и целевую переменную.
