@@ -1,4 +1,5 @@
-from ._eda_distribution import cat_feature_report, num_feature_report, na_bar_plot
+from ._eda_distribution import (
+    cat_feature_report, num_feature_report, na_bar_plot, target_distribution_plot)
 from ._eda_datashift import area_plot, ridge_plot
 
 
@@ -22,6 +23,7 @@ __all__ = [
     'cat_feature_report',
     'num_feature_report',
     'na_bar_plot',
+    'target_distribution_plot',
     # data_shift
     'area_plot',
     'na_datashift',

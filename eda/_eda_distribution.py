@@ -7,13 +7,53 @@ import pandas as pd
 import seaborn as sns
 
 
+def target_distribution_plot(
+        target_col: pd.Series,
+        *,
+        kind: str = 'bar',
+        figsize: Optional[Tuple[float, float]] = None,
+) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
+    """
+    Визуализирует распределение целевых классов.
+
+    Args:
+        target_col: pd.Series c целевой категориальной переменной.
+        kind: вид графика с визуализацией ('bar' / 'pie').
+        figsize: (ширина, высота) рисунка в дюймах.
+
+    Returns:
+        Кортеж (fig, ax).
+          fig: matplotlib.Figure, содержащий график.
+          axes: matplotlib.axes.Axes, содержащий отрисованный график.
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+
+    match kind:
+        case 'bar':
+            target_col.value_counts().plot(
+                kind='bar', rot=0, title='Распределение целевых классов', ax=ax)
+            ax.bar_label(ax.containers[0])
+            ax.set(ylabel='Количество примеров')
+        case 'pie':
+            target_col.value_counts().plot(
+                kind='pie',
+                title='Распределение целевых классов',
+                autopct='%.2f',
+                ax=ax,
+            )
+            fig.tight_layout()
+            ax.set(ylabel=None)
+
+    return fig, ax
+
+
 def cat_feature_report(
         data: pd.DataFrame,
         *,
         feature_colname: str,
         target_colname: str,
         figsize: Optional[Tuple[float, float]] = None,
-        x_rot: Optional[int | float] = 0,
+        x_rot: int | float = 0,
 ) -> Tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]:
     """
     Визуализирует разницу в распределениях категориального признака для целевых классов.
